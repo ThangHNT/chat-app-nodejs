@@ -10,7 +10,7 @@ class UserController {
         try {
             const { username, password } = req.body;
             const hashPassword = await bcrypt.hash(password, 10);
-            const userCheck = await User.findOne({ username, hashPassword });
+            const userCheck = await User.findOne({ username, password: hashPassword });
             if (!userCheck) {
                 return res.json({ msg: 'Tài khoản hoặc mật khẩu không đúng.', status: false });
             } else {
@@ -37,6 +37,7 @@ class UserController {
                 username,
                 password: hashPassword,
                 email,
+                avatar: 'https://kenh14cdn.com/thumb_w/660/203336854389633024/2022/4/3/photo-1-1648980890040503462152.jpg',
             });
             user.save();
             delete user.password;
