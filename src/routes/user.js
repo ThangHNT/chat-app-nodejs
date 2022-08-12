@@ -5,6 +5,7 @@ const userController = require('../controllers/UserController.js');
 router.get('/', userController.home);
 router.get('/api/message-item', userController.messageItem);
 router.get('/api/receiver/:id', userController.getReciever);
+router.post('/api/send-message', userController.sendMessage);
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 

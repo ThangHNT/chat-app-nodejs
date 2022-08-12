@@ -59,11 +59,21 @@ class UserController {
         // res.json(req.params.id);
         User.findOne({ _id: userId }, function (err, user) {
             if (user) {
-                res.json({ status: true, user });
+                const data = {
+                    id: user._id,
+                    username: user.username,
+                    avatar: user.avatar,
+                };
+                res.json({ status: true, data });
             } else {
                 res.json({ status: false, msg: 'Loi server' });
             }
         });
+    }
+
+    sendMessage(req, res, next) {
+        console.log(req.body);
+        res.send('thanh cong');
     }
 }
 
