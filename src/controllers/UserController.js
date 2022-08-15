@@ -1,5 +1,6 @@
 const User = require('../models/user');
-const bcrypt = require('bcrypt');
+const Message = require('../models/message');
+const message = require('../models/message');
 
 class UserController {
     home(req, res, next) {
@@ -72,8 +73,47 @@ class UserController {
     }
 
     sendMessage(req, res, next) {
-        console.log(req.body);
-        res.send('thanh cong');
+        const data = req.body;
+        const message = new Message();
+        message.sender = data.sender;
+        message.receiver = data.receiver;
+        if (data.type === 'text') message.text = data.content;
+        message.save();
+        res.send('gui tin nhan thanh cong');
+    }
+
+    getMessages(req, res, next) {
+        const { sender, receiver } = req.body;
+        let arr = [];
+        Message.find({ sender: sender, receiver: receiver }, function (err, messages) {
+            Message.find({ sender: receiver, receiver: sender }, function (err, messages2) {
+                if (messages !== null && messages2 !== null) {
+                    const data1 = messages.map((item, index) => {
+                        const obj = {
+                            content: item.text,
+                            sender: item.sender,
+                            time: item.createdAt.getTime(),
+                        };
+                        return obj;
+                    });
+                    const data2 = messages2.map((item, index) => {
+                        const obj = {
+                            content: item.text,
+                            sender: item.sender,
+                            time: item.createdAt.getTime(),
+                        };
+                        return obj;
+                    });
+                    arr = [...data1, ...data2];
+                    arr.sort((a, b) => {
+                        return a.time - b.time;
+                    });
+                    return res.json({ status: true, arr });
+                } else {
+                    return res.json({ status: false, msg: 'khong tim thay doan hoi thoai' });
+                }
+            });
+        });
     }
 }
 
