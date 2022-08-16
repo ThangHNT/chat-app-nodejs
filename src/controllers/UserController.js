@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Message = require('../models/message');
 const message = require('../models/message');
+const user = require('../models/user');
 
 class UserController {
     home(req, res, next) {
@@ -50,8 +51,50 @@ class UserController {
     }
 
     messageItem(req, res, next) {
+        const sender = req.body.sender;
         User.find({}, function (err, users) {
-            return res.json(users);
+            if (users) {
+                let arr = [];
+                users.forEach((user) => {
+                    if (user._id != sender) {
+                        arr.push(user);
+                    }
+                });
+                const userList = arr.map((user) => {
+                    return {
+                        id: user._id,
+                        username: user.username,
+                        avatar: user.avatar,
+                    };
+                });
+                return res.json({ status: true, userList });
+            } else {
+                console.log('loi lay ds user');
+                res.json({ status: false, msg: 'loi lay ds user' });
+            }
+        });
+    }
+
+    getLastestMessage(req, res, next) {
+        // console.log(req.body);
+        const { receiver, sender } = req.body;
+        Message.find({ sender, receiver }, function (err, messages) {
+            Message.find({ sender: receiver, receiver: sender }, function (err, messages2) {
+                if (messages !== null && messages2 !== null) {
+                    let n = messages.length;
+                    let m = messages2.length;
+                    let a = messages[n - 1];
+                    let b = messages2[m - 1];
+                    if (a && b) {
+                        let msg = '';
+                        let time1 = a.createdAt.getTime();
+                        let time2 = b.createdAt.getTime();
+                        if (time1 > time2) msg = a;
+                        else msg = b;
+                        return res.json({ status: true, message: msg });
+                    }
+                }
+            });
         });
     }
 
@@ -88,7 +131,7 @@ class UserController {
         Message.find({ sender: sender, receiver: receiver }, function (err, messages) {
             Message.find({ sender: receiver, receiver: sender }, function (err, messages2) {
                 if (messages !== null && messages2 !== null) {
-                    const data1 = messages.map((item, index) => {
+                    const data1 = messages.map((item) => {
                         const obj = {
                             content: item.text,
                             sender: item.sender,
@@ -96,7 +139,7 @@ class UserController {
                         };
                         return obj;
                     });
-                    const data2 = messages2.map((item, index) => {
+                    const data2 = messages2.map((item) => {
                         const obj = {
                             content: item.text,
                             sender: item.sender,
