@@ -89,8 +89,14 @@ class UserController {
                         let msg = '';
                         let time1 = a.createdAt.getTime();
                         let time2 = b.createdAt.getTime();
-                        if (time1 > time2) msg = a;
-                        else msg = b;
+                        if (time1 > time2) {
+                            msg = { message: a, time: time1 };
+                        } else {
+                            msg = {
+                                message: b,
+                                time: time2,
+                            };
+                        }
                         return res.json({ status: true, message: msg });
                     }
                 }
@@ -116,13 +122,21 @@ class UserController {
     }
 
     sendMessage(req, res, next) {
-        const data = req.body;
-        const message = new Message();
-        message.sender = data.sender;
-        message.receiver = data.receiver;
-        if (data.type === 'text') message.text = data.content;
-        message.save();
-        res.send('gui tin nhan thanh cong');
+        const { sender, receiver, messages } = req.body;
+        messages.forEach((msg) => {
+            const message = new Message();
+            message.sender = sender;
+            message.receiver = receiver;
+            if (msg.type === 'text') {
+                message.type = 'text';
+                message.text = msg.msg;
+            } else {
+                message.type = 'img';
+                message.img.data = msg.msg;
+            }
+            message.save();
+        });
+        res.json({ status: true, msg: 'thanh cong' });
     }
 
     getMessages(req, res, next) {
@@ -133,7 +147,9 @@ class UserController {
                 if (messages !== null && messages2 !== null) {
                     const data1 = messages.map((item) => {
                         const obj = {
-                            content: item.text,
+                            type: item.type,
+                            text: item.text,
+                            img: item.img.data,
                             sender: item.sender,
                             time: item.createdAt.getTime(),
                         };
@@ -141,7 +157,9 @@ class UserController {
                     });
                     const data2 = messages2.map((item) => {
                         const obj = {
-                            content: item.text,
+                            type: item.type,
+                            text: item.text,
+                            img: item.img.data,
                             sender: item.sender,
                             time: item.createdAt.getTime(),
                         };
