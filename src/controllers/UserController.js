@@ -132,7 +132,7 @@ class UserController {
                 message.text = msg.msg;
             } else {
                 message.type = 'img';
-                message.img.data = msg.msg;
+                message.img = msg.msg;
             }
             message.save();
         });
@@ -149,7 +149,7 @@ class UserController {
                         const obj = {
                             type: item.type,
                             text: item.text,
-                            img: item.img.data,
+                            img: item.img,
                             sender: item.sender,
                             time: item.createdAt.getTime(),
                         };
@@ -159,7 +159,7 @@ class UserController {
                         const obj = {
                             type: item.type,
                             text: item.text,
-                            img: item.img.data,
+                            img: item.img,
                             sender: item.sender,
                             time: item.createdAt.getTime(),
                         };

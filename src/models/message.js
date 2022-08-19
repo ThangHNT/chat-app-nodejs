@@ -7,7 +7,7 @@ const Message = new Schema(
         receiver: { type: Schema.Types.ObjectId, ref: 'User' },
         text: { type: String, maxLength: 1000 },
         type: { type: String, required: true, default: 'text' },
-        img: { data: Buffer, contentType: String },
+        img: { type: String },
     },
     {
         timestamps: true,
