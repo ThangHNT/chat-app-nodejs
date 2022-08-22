@@ -179,6 +179,7 @@ class UserController {
 
     searchUser(req, res) {
         let name = req.query.q;
+        const exceptionuser = req.query.exceptUser;
         let listUser = [];
         User.find({}, function (err, users) {
             users.forEach((user) => {
@@ -188,11 +189,11 @@ class UserController {
                     avatar: user.avatar,
                     userId: user._id,
                 };
-                if (arr.length == 1 && user.username.startsWith(name)) {
+                if (arr.length == 1 && user.username.startsWith(name) && user._id != exceptionuser) {
                     listUser.push(data);
                 } else {
                     for (let i = 0; i < arr.length; i++) {
-                        if (user.username.indexOf(arr[i]) > -1) {
+                        if (user.username.indexOf(arr[i]) > -1 && user._id != exceptionuser) {
                             listUser.push(data);
                             break;
                         }
