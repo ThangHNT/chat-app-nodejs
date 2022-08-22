@@ -176,6 +176,36 @@ class UserController {
             });
         });
     }
+
+    searchUser(req, res) {
+        let name = req.query.q;
+        let listUser = [];
+        User.find({}, function (err, users) {
+            users.forEach((user) => {
+                const arr = name.split(' ');
+                const data = {
+                    username: user.username,
+                    avatar: user.avatar,
+                    userId: user._id,
+                };
+                if (arr.length == 1 && user.username.startsWith(name)) {
+                    listUser.push(data);
+                } else {
+                    for (let i = 0; i < arr.length; i++) {
+                        if (user.username.indexOf(arr[i]) > -1) {
+                            listUser.push(data);
+                            break;
+                        }
+                    }
+                }
+            });
+            if (listUser.length > 0) {
+                return res.json({ status: true, listUser });
+            } else {
+                return res.json({ status: false, msg: 'ko co nguoi dung trong he thong' });
+            }
+        });
+    }
 }
 
 module.exports = new UserController();
