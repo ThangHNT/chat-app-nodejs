@@ -1,7 +1,5 @@
 const User = require('../models/user');
 const Message = require('../models/message');
-const message = require('../models/message');
-const user = require('../models/user');
 
 class UserController {
     home(req, res, next) {
@@ -11,13 +9,17 @@ class UserController {
     async login(req, res, next) {
         try {
             const { username, password } = req.body;
-            // const hashPassword = await bcrypt.hash(password, 10);
 
             const userCheck = await User.findOne({ username, password });
             if (!userCheck) {
                 return res.json({ msg: 'Tài khoản hoặc mật khẩu không đúng.', status: false });
             } else {
-                return res.json({ status: true, user: userCheck });
+                const user = {
+                    username: userCheck.username,
+                    _id: userCheck._id,
+                    avatar: userCheck.avatar,
+                };
+                return res.json({ status: true, user });
             }
         } catch (err) {
             console.log('login that bai');
@@ -35,7 +37,6 @@ class UserController {
             if (emailCheck) {
                 return res.json({ msg: 'Email đã được đăng ký', status: false });
             }
-            // const hashPassword = await bcrypt.hash(password, 10);
             const user = new User({
                 username,
                 password,
@@ -44,7 +45,12 @@ class UserController {
             });
             user.save();
             delete user.password;
-            return res.json({ status: true, user });
+            const newUser = {
+                username: user.username,
+                _id: user._id,
+                avatar: user.avatar,
+            };
+            return res.json({ status: true, newUser });
         } catch (e) {
             console.log('loi dang ky');
         }
