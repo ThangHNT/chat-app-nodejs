@@ -33,40 +33,40 @@ const io = socket(server, {
 
 io.use((socket, next) => {
     const userId = socket.handshake.auth.userId;
-    const username = socket.handshake.auth.username;
-    if (!userId || !username) {
-        return next(new Error('invalid username'));
+    if (!userId) {
+        console.log('loi set id');
+        return next(new Error('invalid user-id'));
     }
     socket.userId = userId;
-    socket.username = username;
     next();
 });
 
 io.on('connection', (socket) => {
     const users = [];
-
     for (let [id, socket] of io.of('/').sockets) {
-        users.push({ socketId: id, userId: socket.userId, username: socket.username });
+        users.push({ socketId: id, userId: socket.userId });
     }
     socket.emit('users', users);
 
     socket.broadcast.emit('user just connected', {
         socketId: socket.id,
         userId: socket.userId,
-        username: socket.username,
     });
 
-    socket.on('send message', ({ sender, receiver, content }) => {
-        console.log(users);
-        socket.emit('private message', { content });
-        // socket.to(receiver).to(sender).emit('private message', {
-        //     content,
-        //     receiver,
-        //     sender,
-        // });
+    console.log(io.allSockets());
+
+    socket.on('send message', ({ to, from, content }) => {
+        // console.log('to', to);
+        // console.log('from', from);
+        socket.to(to).to(from).emit('private message', {
+            content,
+            to,
+            from,
+        });
     });
-    socket.on('disconnect', () => {
+
+    socket.on('disconnect', async () => {
         // console.log('Client disconnected', socket.id);
-        socket.broadcast.emit('user disconnected', socket.username);
+        // socket.broadcast.emit('user disconnected', socket.username);
     });
 });
