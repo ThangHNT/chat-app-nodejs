@@ -104,6 +104,20 @@ class UserController {
                             };
                         }
                         return res.json({ status: true, message: msg });
+                    } else if (a) {
+                        let time = a.createdAt.getTime();
+                        let msg = {
+                            message: a,
+                            time,
+                        };
+                        return res.json({ status: true, message: msg });
+                    } else if (b) {
+                        let time = b.createdAt.getTime();
+                        let msg = {
+                            message: b,
+                            time,
+                        };
+                        return res.json({ status: true, message: msg });
                     }
                 }
             });

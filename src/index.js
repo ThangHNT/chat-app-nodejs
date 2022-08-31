@@ -2,10 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const route = require('./routes/index');
+const fs = require('fs');
 const app = express();
+const path = require('path');
 const socket = require('socket.io');
 require('dotenv').config();
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100mb' }));
 
@@ -53,7 +56,7 @@ io.on('connection', (socket) => {
         userId: socket.userId,
     });
 
-    console.log(io.allSockets());
+    // console.log(io.allSockets());
 
     socket.on('send message', ({ to, from, content }) => {
         // console.log('to', to);
@@ -66,7 +69,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', async () => {
-        // console.log('Client disconnected', socket.id);
-        // socket.broadcast.emit('user disconnected', socket.username);
+        console.log('Client disconnected:', socket.id);
+        socket.broadcast.emit('user disconnected', socket.id);
     });
 });
