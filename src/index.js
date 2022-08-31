@@ -56,15 +56,16 @@ io.on('connection', (socket) => {
         userId: socket.userId,
     });
 
-    // console.log(io.allSockets());
+    console.log(io.allSockets());
 
-    socket.on('send message', ({ to, from, content }) => {
+    socket.on('send message', ({ sender, to, from, content }) => {
         // console.log('to', to);
         // console.log('from', from);
         socket.to(to).to(from).emit('private message', {
             content,
             to,
             from,
+            sender,
         });
     });
 
