@@ -56,7 +56,7 @@ io.on('connection', (socket) => {
         userId: socket.userId,
     });
 
-    console.log(io.allSockets());
+    // console.log(io.allSockets());
 
     socket.on('send message', ({ sender, receiver, to, from, content }) => {
         // console.log('to', to);

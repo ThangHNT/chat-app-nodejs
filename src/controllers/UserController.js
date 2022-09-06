@@ -143,16 +143,16 @@ class UserController {
 
     sendMessage(req, res, next) {
         const { sender, receiver, messages } = req.body;
-        messages.forEach((msg) => {
+        messages.content.forEach((msg) => {
             const message = new Message();
             message.sender = sender;
             message.receiver = receiver;
             if (msg.type === 'text') {
                 message.type = 'text';
-                message.text = msg.msg;
+                message.text = msg.text;
             } else {
                 message.type = 'img';
-                message.img = msg.msg;
+                message.img = msg.img;
             }
             message.save();
         });
