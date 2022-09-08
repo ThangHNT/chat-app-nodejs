@@ -8,6 +8,11 @@ const Message = new Schema(
         text: { type: String, maxLength: 1000 },
         type: { type: String, required: true, default: 'text' },
         img: { type: String },
+        file: {
+            content: { type: String },
+            filename: { type: String },
+            size: { type: String },
+        },
     },
     {
         timestamps: true,

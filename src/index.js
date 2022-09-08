@@ -31,7 +31,9 @@ const server = app.listen(process.env.PORT, () => {
 const io = socket(server, {
     cors: {
         orgin: 'http://localhost:5000',
+        credentials: true,
     },
+    maxHttpBufferSize: 1e8,
 });
 
 io.use((socket, next) => {

@@ -143,6 +143,7 @@ class UserController {
 
     sendMessage(req, res, next) {
         const { sender, receiver, messages } = req.body;
+        // console.log(messages);
         messages.content.forEach((msg) => {
             const message = new Message();
             message.sender = sender;
@@ -150,9 +151,15 @@ class UserController {
             if (msg.type === 'text') {
                 message.type = 'text';
                 message.text = msg.text;
-            } else {
+            } else if (msg.type == 'img') {
                 message.type = 'img';
                 message.img = msg.img;
+            } else if (msg.type == 'text-file') {
+                // console.log(msg.file);
+                message.type = 'text-file';
+                message.file.content = msg.file.content;
+                message.file.filename = msg.file.filename;
+                message.file.size = msg.file.size;
             }
             message.save();
         });
@@ -170,6 +177,7 @@ class UserController {
                             type: item.type,
                             text: item.text,
                             img: item.img,
+                            file: item.file,
                             sender: item.sender,
                             time: item.createdAt.getTime(),
                         };
@@ -180,6 +188,7 @@ class UserController {
                             type: item.type,
                             text: item.text,
                             img: item.img,
+                            file: item.file,
                             sender: item.sender,
                             time: item.createdAt.getTime(),
                         };
