@@ -155,7 +155,13 @@ class UserController {
             } else if (msg.type == 'img') {
                 message.type = 'img';
                 message.img = msg.img;
-            } else if (type == 'text-file' || type == 'video' || type == 'audio') {
+            } else if (
+                type == 'text-file' ||
+                type == 'video' ||
+                type == 'audio' ||
+                type == 'doc-file' ||
+                type == 'pdf-file'
+            ) {
                 // console.log(msg.file);
                 message.type = type;
                 message.file.content = msg.file.content;
