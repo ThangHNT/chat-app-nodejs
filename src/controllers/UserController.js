@@ -148,15 +148,16 @@ class UserController {
             const message = new Message();
             message.sender = sender;
             message.receiver = receiver;
+            const type = msg.type;
             if (msg.type === 'text') {
                 message.type = 'text';
                 message.text = msg.text;
             } else if (msg.type == 'img') {
                 message.type = 'img';
                 message.img = msg.img;
-            } else if (msg.type == 'text-file') {
+            } else if (type == 'text-file' || type == 'video' || type == 'audio') {
                 // console.log(msg.file);
-                message.type = 'text-file';
+                message.type = type;
                 message.file.content = msg.file.content;
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
