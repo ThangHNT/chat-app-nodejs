@@ -41,7 +41,7 @@ class UserController {
                 username,
                 password,
                 email,
-                avatar: 'https://kenh14cdn.com/thumb_w/660/203336854389633024/2022/4/3/photo-1-1648980890040503462152.jpg',
+                avatar: 'https://png.pngtree.com/element_our/md/20180710/md_5b44128b4c192.jpg',
             });
             user.save();
             delete user.password;
@@ -86,7 +86,8 @@ class UserController {
         const { receiver, sender } = req.body;
         Message.find({ sender, receiver }, function (err, messages) {
             Message.find({ sender: receiver, receiver: sender }, function (err, messages2) {
-                if (messages !== null && messages2 !== null) {
+                // console.log(messages == null, messages2);
+                if (messages.length > 0 || messages2.length > 0) {
                     let n = messages.length;
                     let m = messages2.length;
                     let a = messages[n - 1];
@@ -119,6 +120,8 @@ class UserController {
                         };
                         return res.json({ status: true, message: msg });
                     }
+                } else {
+                    return res.json({ status: false, msg: 'chua co tin nhan nao dc gui' });
                 }
             });
         });
@@ -135,6 +138,7 @@ class UserController {
                     avatar: user.avatar,
                 };
                 res.json({ status: true, data });
+                // console.log(data);
             } else {
                 res.json({ status: false, msg: 'Loi server' });
             }
