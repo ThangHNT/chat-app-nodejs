@@ -81,52 +81,6 @@ class UserController {
         });
     }
 
-    getLastestMessage(req, res, next) {
-        // console.log(req.body);
-        const { receiver, sender } = req.body;
-        Message.find({ sender, receiver }, function (err, messages) {
-            Message.find({ sender: receiver, receiver: sender }, function (err, messages2) {
-                // console.log(messages == null, messages2);
-                if (messages.length > 0 || messages2.length > 0) {
-                    let n = messages.length;
-                    let m = messages2.length;
-                    let a = messages[n - 1];
-                    let b = messages2[m - 1];
-                    if (a && b) {
-                        let msg = '';
-                        let time1 = a.createdAt.getTime();
-                        let time2 = b.createdAt.getTime();
-                        if (time1 > time2) {
-                            msg = { message: a, time: time1 };
-                        } else {
-                            msg = {
-                                message: b,
-                                time: time2,
-                            };
-                        }
-                        return res.json({ status: true, message: msg });
-                    } else if (a) {
-                        let time = a.createdAt.getTime();
-                        let msg = {
-                            message: a,
-                            time,
-                        };
-                        return res.json({ status: true, message: msg });
-                    } else if (b) {
-                        let time = b.createdAt.getTime();
-                        let msg = {
-                            message: b,
-                            time,
-                        };
-                        return res.json({ status: true, message: msg });
-                    }
-                } else {
-                    return res.json({ status: false, msg: 'chua co tin nhan nao dc gui' });
-                }
-            });
-        });
-    }
-
     getReciever(req, res, next) {
         const userId = req.params.id;
         // res.json(req.params.id);
@@ -142,78 +96,6 @@ class UserController {
             } else {
                 res.json({ status: false, msg: 'Loi server' });
             }
-        });
-    }
-
-    sendMessage(req, res, next) {
-        const { sender, receiver, messages } = req.body;
-        // console.log(messages);
-        messages.content.forEach((msg) => {
-            const message = new Message();
-            message.sender = sender;
-            message.receiver = receiver;
-            const type = msg.type;
-            if (msg.type === 'text') {
-                message.type = 'text';
-                message.text = msg.text;
-            } else if (msg.type == 'img') {
-                message.type = 'img';
-                message.img = msg.img;
-            } else if (
-                type == 'text-file' ||
-                type == 'video' ||
-                type == 'audio' ||
-                type == 'doc-file' ||
-                type == 'pdf-file'
-            ) {
-                // console.log(msg.file);
-                message.type = type;
-                message.file.content = msg.file.content;
-                message.file.filename = msg.file.filename;
-                message.file.size = msg.file.size;
-            }
-            message.save();
-        });
-        res.json({ status: true, msg: 'thanh cong' });
-    }
-
-    getMessages(req, res, next) {
-        const { sender, receiver } = req.body;
-        let arr = [];
-        Message.find({ sender: sender, receiver: receiver }, function (err, messages) {
-            Message.find({ sender: receiver, receiver: sender }, function (err, messages2) {
-                if (messages !== null && messages2 !== null) {
-                    const data1 = messages.map((item) => {
-                        const obj = {
-                            type: item.type,
-                            text: item.text,
-                            img: item.img,
-                            file: item.file,
-                            sender: item.sender,
-                            time: item.createdAt.getTime(),
-                        };
-                        return obj;
-                    });
-                    const data2 = messages2.map((item) => {
-                        const obj = {
-                            type: item.type,
-                            text: item.text,
-                            img: item.img,
-                            file: item.file,
-                            sender: item.sender,
-                            time: item.createdAt.getTime(),
-                        };
-                        return obj;
-                    });
-                    arr = [...data1, ...data2];
-                    arr.sort((a, b) => {
-                        return a.time - b.time;
-                    });
-                    return res.json({ status: true, arr });
-                } else {
-                    return res.json({ status: false, msg: 'khong tim thay doan hoi thoai' });
-                }
-            });
         });
     }
 
@@ -245,6 +127,65 @@ class UserController {
             } else {
                 return res.json({ status: false, msg: 'ko co nguoi dung trong he thong' });
             }
+        });
+    }
+
+    blockUser(req, res) {
+        // console.log(req.body);
+        const { sender, receiver } = req.body;
+        User.findOne({ _id: sender }, function (err, user) {
+            if (user) {
+                user.blockList.push(receiver);
+                user.save();
+                res.json({ status: true });
+            } else res.json({ status: false });
+        });
+    }
+
+    checkBlockStatus(req, res) {
+        const { currentUser, receiver } = req.body;
+        User.findOne({ _id: currentUser }, function (err, user) {
+            if (user) {
+                const list = user.blockList;
+                const checkBlocked = list.some((userId) => {
+                    return userId == receiver;
+                });
+                if (checkBlocked) {
+                    return res.json({ status: true, blocked: 'block' });
+                } else {
+                    User.findOne({ _id: receiver }, function (err, user) {
+                        if (user) {
+                            const list = user.blockList;
+                            const checkBlocked = list.some((userId) => {
+                                return userId == currentUser;
+                            });
+                            if (checkBlocked) {
+                                return res.json({ status: true, blocked: 'blocked' });
+                            } else {
+                                return res.json({ status: true, blocked: false });
+                            }
+                        } else return res.json({ status: false, ms: 'ko tim thay ng dung' });
+                    });
+                }
+            } else return res.json({ status: false, ms: 'ko tim thay ng dung' });
+        });
+    }
+
+    checkBlockedUser(req, res) {
+        // console.log(req.body);
+        const { currentUser, blocker } = req.body;
+        User.findOne({ _id: currentUser }, function (err, user) {
+            if (user) {
+                const list = user.blockList;
+                const checkBlocked = list.some((userId) => {
+                    return userId == blocker;
+                });
+                if (checkBlocked) {
+                    return res.json({ status: true, blocked: true });
+                } else {
+                    return res.json({ status: true, blocked: false });
+                }
+            } else return res.json({ status: false });
         });
     }
 }

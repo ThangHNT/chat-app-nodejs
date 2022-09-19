@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoose_delete = require('mongoose-delete');
 const Schema = mongoose.Schema;
 
 const Message = new Schema(
@@ -13,10 +14,15 @@ const Message = new Schema(
             filename: { type: String },
             size: { type: String },
         },
+        reactionIcon: { type: String, default: '' },
+        userDeleted: { type: Schema.Types.ObjectId, ref: 'User' },
     },
     {
         timestamps: true,
     },
 );
+
+// plugin soft delete
+Message.plugin(mongoose_delete);
 
 module.exports = mongoose.model('Message', Message);

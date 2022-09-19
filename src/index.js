@@ -52,6 +52,7 @@ io.on('connection', (socket) => {
         users.push({ socketId: id, userId: socket.userId });
     }
     socket.emit('users', users);
+    // console.log(users);
 
     socket.broadcast.emit('user just connected', {
         socketId: socket.id,
@@ -72,8 +73,23 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('send reaction icon', ({ sender, receiver, to, from, icon, messageId }) => {
+        // console.log(messageId);
+        socket.to(to).to(from).emit('private reaction message', {
+            messageId,
+            icon,
+            sender,
+            receiver,
+        });
+    });
+
+    socket.on('block-user', ({ sender, to, from, receiver, content }) => {
+        // console.log(data);
+        socket.to(to).to(from).emit('user-blocked', { sender, receiver, content });
+    });
+
     socket.on('disconnect', async () => {
-        console.log('Client disconnected:', socket.id);
+        // console.log('Client disconnected:', socket.id);
         socket.broadcast.emit('user disconnected', socket.id);
     });
 });

@@ -3,13 +3,12 @@ const router = express.Router();
 const userController = require('../controllers/UserController.js');
 
 router.get('/', userController.home);
-router.post('/api/message-item', userController.messageItem);
-router.get('/api/receiver/:id', userController.getReciever);
-router.get('/api/search', userController.searchUser);
-router.post('/api/send-message', userController.sendMessage);
-router.post('/api/lastest-message', userController.getLastestMessage);
-router.post('/api/get-messages', userController.getMessages);
-router.post('/register', userController.register);
+router.get('/api/receiver/:id', userController.getReciever); // lấy thông tin ng định gửi tin nhắn
+router.post('/api/block-user', userController.blockUser); // chặn ng nào đó
+router.post('/api/check-block-status', userController.checkBlockStatus); // kiểm tra tình trạng chặn
+router.get('/api/search', userController.searchUser); // tìm kiếm ng dùng trong hệ thống
+router.post('/api/message-item', userController.messageItem); // lấy thông tin ng dùng và hiển thị bên sidebar
+router.post('/register', userController.register); // đk tk mới
 router.post('/login', userController.login);
 
 module.exports = router;
