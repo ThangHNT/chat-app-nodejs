@@ -83,9 +83,14 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('block-user', ({ sender, to, from, receiver, content }) => {
-        // console.log(data);
-        socket.to(to).to(from).emit('user-blocked', { sender, receiver, content });
+    socket.on('block-user', ({ sender, to, from, receiver }) => {
+        // console.log(sender, receiver);
+        socket.to(to).to(from).emit('user is blocked', { sender, receiver });
+    });
+
+    socket.on('unblock-user', ({ sender, to, from, receiver }) => {
+        // console.log(sender, receiver);
+        socket.to(to).to(from).emit('user is unblocked', { sender, receiver });
     });
 
     socket.on('disconnect', async () => {

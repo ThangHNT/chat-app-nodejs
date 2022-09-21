@@ -135,8 +135,13 @@ class UserController {
         const { sender, receiver } = req.body;
         User.findOne({ _id: sender }, function (err, user) {
             if (user) {
-                user.blockList.push(receiver);
-                user.save();
+                const checkUserExist = user.blockList.some((item) => {
+                    return item == receiver;
+                });
+                if (!checkUserExist) {
+                    user.blockList.push(receiver);
+                    user.save();
+                }
                 res.json({ status: true });
             } else res.json({ status: false });
         });
@@ -144,15 +149,45 @@ class UserController {
 
     checkBlockStatus(req, res) {
         const { currentUser, receiver } = req.body;
+        User.findOne({ _id: currentUser }, function (err, users1) {
+            const result = { status: true };
+            User.findOne({ _id: receiver }, function (err, users2) {
+                const list = users1.blockList;
+                const checkBlocked = list.some((userId) => {
+                    return userId == receiver;
+                });
+                if (checkBlocked) {
+                    result.block = true;
+                    result.status = false;
+                }
+                const list2 = users2.blockList;
+                const checkBlocked2 = list2.some((userId) => {
+                    return userId == currentUser;
+                });
+                if (checkBlocked2) {
+                    result.blocked = true;
+                    result.status = false;
+                }
+                return res.json(result);
+            });
+        });
+    }
+
+    checkBlockStatus2(req, res) {
+        const { currentUser, receiver } = req.body;
         User.findOne({ _id: currentUser }, function (err, user) {
+            // kiểm tra xem có chặn ng này ko
             if (user) {
+                const arr = {};
                 const list = user.blockList;
                 const checkBlocked = list.some((userId) => {
                     return userId == receiver;
                 });
                 if (checkBlocked) {
-                    return res.json({ status: true, blocked: 'block' });
+                    arr.block = true;
+                    // return res.json({ status: true, blocked: 'block' });
                 } else {
+                    // kiểm tra xem có bị chặn khong
                     User.findOne({ _id: receiver }, function (err, user) {
                         if (user) {
                             const list = user.blockList;
@@ -160,32 +195,15 @@ class UserController {
                                 return userId == currentUser;
                             });
                             if (checkBlocked) {
-                                return res.json({ status: true, blocked: 'blocked' });
+                                // return res.json({ status: true, blocked: 'blocked' });
+                                arr.blocked = true;
                             } else {
-                                return res.json({ status: true, blocked: false });
+                                return res.json({ status: true, blocked: 'false' });
                             }
                         } else return res.json({ status: false, ms: 'ko tim thay ng dung' });
                     });
                 }
             } else return res.json({ status: false, ms: 'ko tim thay ng dung' });
-        });
-    }
-
-    checkBlockedUser(req, res) {
-        // console.log(req.body);
-        const { currentUser, blocker } = req.body;
-        User.findOne({ _id: currentUser }, function (err, user) {
-            if (user) {
-                const list = user.blockList;
-                const checkBlocked = list.some((userId) => {
-                    return userId == blocker;
-                });
-                if (checkBlocked) {
-                    return res.json({ status: true, blocked: true });
-                } else {
-                    return res.json({ status: true, blocked: false });
-                }
-            } else return res.json({ status: false });
         });
     }
 }
