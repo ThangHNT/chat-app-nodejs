@@ -147,10 +147,28 @@ class UserController {
         });
     }
 
+    unblockUser(req, res) {
+        // console.log(req.body);
+        const { sender, receiver } = req.body;
+        User.findOne({ _id: sender }, function (err, user) {
+            if (user) {
+                let arr = [];
+                user.blockList.forEach((item) => {
+                    if (item != receiver) {
+                        arr.push(item);
+                    }
+                });
+                user.blockList = arr;
+                user.save();
+                res.json({ status: true });
+            } else res.json({ status: false });
+        });
+    }
+
     checkBlockStatus(req, res) {
         const { currentUser, receiver } = req.body;
         User.findOne({ _id: currentUser }, function (err, users1) {
-            const result = { status: true };
+            const result = {};
             User.findOne({ _id: receiver }, function (err, users2) {
                 const list = users1.blockList;
                 const checkBlocked = list.some((userId) => {
@@ -158,7 +176,6 @@ class UserController {
                 });
                 if (checkBlocked) {
                     result.block = true;
-                    result.status = false;
                 }
                 const list2 = users2.blockList;
                 const checkBlocked2 = list2.some((userId) => {
@@ -166,44 +183,9 @@ class UserController {
                 });
                 if (checkBlocked2) {
                     result.blocked = true;
-                    result.status = false;
                 }
                 return res.json(result);
             });
-        });
-    }
-
-    checkBlockStatus2(req, res) {
-        const { currentUser, receiver } = req.body;
-        User.findOne({ _id: currentUser }, function (err, user) {
-            // kiểm tra xem có chặn ng này ko
-            if (user) {
-                const arr = {};
-                const list = user.blockList;
-                const checkBlocked = list.some((userId) => {
-                    return userId == receiver;
-                });
-                if (checkBlocked) {
-                    arr.block = true;
-                    // return res.json({ status: true, blocked: 'block' });
-                } else {
-                    // kiểm tra xem có bị chặn khong
-                    User.findOne({ _id: receiver }, function (err, user) {
-                        if (user) {
-                            const list = user.blockList;
-                            const checkBlocked = list.some((userId) => {
-                                return userId == currentUser;
-                            });
-                            if (checkBlocked) {
-                                // return res.json({ status: true, blocked: 'blocked' });
-                                arr.blocked = true;
-                            } else {
-                                return res.json({ status: true, blocked: 'false' });
-                            }
-                        } else return res.json({ status: false, ms: 'ko tim thay ng dung' });
-                    });
-                }
-            } else return res.json({ status: false, ms: 'ko tim thay ng dung' });
         });
     }
 }
