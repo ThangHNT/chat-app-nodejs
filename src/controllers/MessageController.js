@@ -90,6 +90,20 @@ class MessageController {
         });
     }
 
+    removeReactionIcon(req, res) {
+        const { messageId } = req.body;
+        // console.log(req.body);
+        Message.findOne({ _id: messageId }, function (err, message) {
+            if (message) {
+                message.reactionIcon = '';
+                message.save();
+                return res.json({ status: true });
+            } else {
+                res.json({ status: false });
+            }
+        });
+    }
+
     getLastestMessage(req, res, next) {
         // console.log(req.body);
         const { receiver, sender } = req.body;

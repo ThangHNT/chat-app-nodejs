@@ -93,6 +93,11 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('user is unblocked', { sender, receiver });
     });
 
+    socket.on('remove reaction icon', ({ from, to, receiver, messageId }) => {
+        // console.log(data);
+        socket.to(to).to(from).emit('remove reaction icon now', { receiver, messageId });
+    });
+
     socket.on('disconnect', async () => {
         // console.log('Client disconnected:', socket.id);
         socket.broadcast.emit('user disconnected', socket.id);
