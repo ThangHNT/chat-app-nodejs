@@ -2,10 +2,15 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const Setting = new Schema({
-    theme: { type: String, default: '0' },
-    user1: { type: Schema.Types.ObjectId, ref: 'User' },
-    user2: { type: Schema.Types.ObjectId, ref: 'User' },
-    darkMode: { type: Boolean, default: false },
+    chat: {
+        theme: { type: Map, default: new Map() },
+    },
+    general: {
+        darkMode: { type: Boolean, default: false },
+        texttingSound: { type: Boolean, default: false },
+        sendMessageSound: { type: Boolean, default: false },
+        notificationSound: { type: Boolean, default: false },
+    },
 });
 
 module.exports = mongoose.model('Setting', Setting);

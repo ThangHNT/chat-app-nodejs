@@ -94,8 +94,11 @@ io.on('connection', (socket) => {
     });
 
     socket.on('remove reaction icon', ({ from, to, receiver, messageId }) => {
-        // console.log(data);
-        socket.to(to).to(from).emit('remove reaction icon now', { receiver, messageId });
+        socket.to(to).to(from).emit('remove reaction icon private', { receiver, messageId });
+    });
+
+    socket.on('change theme', ({ sender, theme, to, from }) => {
+        socket.to(to).to(from).emit('change theme private', { user: sender, theme });
     });
 
     socket.on('disconnect', async () => {

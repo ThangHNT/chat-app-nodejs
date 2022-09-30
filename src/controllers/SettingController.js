@@ -5,21 +5,22 @@ class SettingController {
     getTheme(req, res) {
         const { sender, receiver } = req.body;
         // console.log(req.body);
-        Setting.findOne({ user1: sender, user2: receiver }, function (err, setting) {
-            Setting.findOne({ user1: receiver, user2: sender }, (err, setting2) => {
-                if (!setting && !setting2) {
-                    const setting = new Setting();
-                    setting.user1 = sender;
-                    setting.user2 = receiver;
-                    setting.save();
-                    return res.send({ status: true, theme: '0' });
-                } else if (setting) {
-                    return res.json({ status: true, theme: setting.theme });
-                } else if (setting2) {
-                    return res.json({ status: true, theme: setting2.theme });
-                }
-            });
-        });
+        return res.send('oke');
+        // Setting.findOne({ user1: sender, user2: receiver }, function (err, setting) {
+        //     Setting.findOne({ user1: receiver, user2: sender }, (err, setting2) => {
+        //         if (!setting && !setting2) {
+        //             const setting = new Setting();
+        //             setting.user1 = sender;
+        //             setting.user2 = receiver;
+        //             setting.save();
+        //             return res.send({ status: true, theme: '0' });
+        //         } else if (setting) {
+        //             return res.json({ status: true, theme: setting.theme });
+        //         } else if (setting2) {
+        //             return res.json({ status: true, theme: setting2.theme });
+        //         }
+        //     });
+        // });
     }
 
     deleteAll(req, res) {
