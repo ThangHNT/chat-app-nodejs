@@ -54,6 +54,36 @@ class SettingController {
                 console.log('loi change them');
             });
     }
+
+    setBackgroundImage(req, res) {
+        const { sender, receiver, image } = req.body;
+        // console.log(sender, receiver);
+        const promise = Promise.resolve();
+        promise
+            .then(() => {
+                User.findOne({ _id: sender }, (err, user) => {
+                    Setting.findOne({ _id: user.setting }, (err, setting) => {
+                        // console.log(setting.chat.theme);
+                        setting.chat.backgroundImage.set(receiver, image);
+                        setting.save();
+                    });
+                });
+            })
+            .then(() => {
+                User.findOne({ _id: receiver }, (err, user) => {
+                    Setting.findOne({ _id: user.setting }, (err, setting) => {
+                        setting.chat.backgroundImage.set(sender, image);
+                        setting.save();
+                    });
+                });
+            })
+            .then(() => {
+                return res.json({ status: true });
+            })
+            .catch((err) => {
+                console.log('loi change them');
+            });
+    }
 }
 
 module.exports = new SettingController();

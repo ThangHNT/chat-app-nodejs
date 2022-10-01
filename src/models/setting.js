@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const Setting = new Schema({
     chat: {
         theme: { type: Map, default: new Map() },
+        backgroundImage: { type: Map, default: new Map() },
     },
     general: {
         darkMode: { type: Boolean, default: false },
