@@ -5,22 +5,18 @@ class SettingController {
     getTheme(req, res) {
         const { sender, receiver } = req.body;
         // console.log(req.body);
-        return res.send('oke');
-        // Setting.findOne({ user1: sender, user2: receiver }, function (err, setting) {
-        //     Setting.findOne({ user1: receiver, user2: sender }, (err, setting2) => {
-        //         if (!setting && !setting2) {
-        //             const setting = new Setting();
-        //             setting.user1 = sender;
-        //             setting.user2 = receiver;
-        //             setting.save();
-        //             return res.send({ status: true, theme: '0' });
-        //         } else if (setting) {
-        //             return res.json({ status: true, theme: setting.theme });
-        //         } else if (setting2) {
-        //             return res.json({ status: true, theme: setting2.theme });
-        //         }
-        //     });
-        // });
+        User.findOne({ _id: sender }, (err, user) => {
+            Setting.findOne({ _id: user.setting }, (err, setting) => {
+                // console.log(setting.chat.theme);
+                const theme = setting.chat.theme.get(receiver);
+                if (theme) {
+                    return res.json({ status: true, theme });
+                } else {
+                    setting.chat.theme.set(receiver, '0');
+                    return res.json({ status: true, theme: '0' });
+                }
+            });
+        });
     }
 
     deleteAll(req, res) {
@@ -32,18 +28,31 @@ class SettingController {
     changeTheme(req, res) {
         // console.log(req.body);
         const { sender, receiver, theme } = req.body;
-        Setting.findOne({ user1: sender, user2: receiver }, function (err, setting) {
-            Setting.findOne({ user1: receiver, user2: sender }, function (err, setting2) {
-                if (setting) {
-                    setting.theme = theme;
-                    setting.save();
-                } else if (setting2) {
-                    setting2.theme = theme;
-                    setting2.save();
-                }
+        const promise = Promise.resolve();
+        promise
+            .then(() => {
+                User.findOne({ _id: sender }, (err, user) => {
+                    Setting.findOne({ _id: user.setting }, (err, setting) => {
+                        // console.log(setting.chat.theme);
+                        setting.chat.theme.set(receiver, theme);
+                        setting.save();
+                    });
+                });
+            })
+            .then(() => {
+                User.findOne({ _id: receiver }, (err, user) => {
+                    Setting.findOne({ _id: user.setting }, (err, setting) => {
+                        setting.chat.theme.set(sender, theme);
+                        setting.save();
+                    });
+                });
+            })
+            .then(() => {
                 return res.json({ status: true });
+            })
+            .catch((err) => {
+                console.log('loi change them');
             });
-        });
     }
 }
 

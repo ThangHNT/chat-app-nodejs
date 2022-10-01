@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const Message = require('../models/message');
+const Setting = require('../models/setting');
 
 class UserController {
     home(req, res, next) {
@@ -19,7 +19,19 @@ class UserController {
                     _id: userCheck._id,
                     avatar: userCheck.avatar,
                 };
-                return res.json({ status: true, user });
+                if (!userCheck.setting) {
+                    const setting = new Setting();
+                    userCheck.setting = setting;
+                    setting.save();
+                    userCheck.save();
+                    user.setting = setting.general;
+                    return res.json({ status: true, user });
+                } else {
+                    Setting.findOne({ _id: userCheck.setting }, (err, setting) => {
+                        user.setting = setting.general;
+                        return res.json({ status: true, user });
+                    });
+                }
             }
         } catch (err) {
             console.log('login that bai');
@@ -43,12 +55,16 @@ class UserController {
                 email,
                 avatar: 'https://png.pngtree.com/element_our/md/20180710/md_5b44128b4c192.jpg',
             });
-            user.save();
             delete user.password;
+            const setting = new Setting();
+            user.setting = setting;
+            setting.save();
+            user.save();
             const newUser = {
                 username: user.username,
                 _id: user._id,
                 avatar: user.avatar,
+                setting: setting.general,
             };
             return res.json({ status: true, newUser });
         } catch (e) {
