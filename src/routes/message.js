@@ -8,5 +8,6 @@ router.post('/api/delete-messages', messageController.deleteMessages); // xóa �
 router.post('/api/send/message', messageController.sendMessage); // gửi tin nhắn
 router.post('/api/lastest-message', messageController.getLastestMessage); // lấy tin nhắn mới nhất đã gửi
 router.post('/api/get/messages', messageController.getMessages); // lấy tất cả tin nhắn đã gửi
+router.post('/api/revoked-message', messageController.revokedMessage); // gỡ bỏ tin nhắn
 
 module.exports = router;

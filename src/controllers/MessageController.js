@@ -153,6 +153,11 @@ class MessageController {
     deleteMessages(req, res) {
         return res.json({ status: true });
     }
+
+    revokedMessage(req, res) {
+        console.log(req.body);
+        return res.send('oke');
+    }
 }
 
 module.exports = new MessageController();

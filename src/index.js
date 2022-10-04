@@ -101,6 +101,11 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('change theme private', { user: sender, theme });
     });
 
+    socket.on('change background', ({ sender, background, to, from }) => {
+        // console.log(sender);
+        socket.to(to).to(from).emit('change background private', { user: sender, backgroundImage: background });
+    });
+
     socket.on('disconnect', async () => {
         // console.log('Client disconnected:', socket.id);
         socket.broadcast.emit('user disconnected', socket.id);

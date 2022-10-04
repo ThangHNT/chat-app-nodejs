@@ -8,13 +8,22 @@ class SettingController {
         User.findOne({ _id: sender }, (err, user) => {
             Setting.findOne({ _id: user.setting }, (err, setting) => {
                 // console.log(setting.chat.theme);
+                // return res.json({ status: true, setting: setting.chat });
+                let data = {};
                 const theme = setting.chat.theme.get(receiver);
+                const backgroundImage = setting.chat.backgroundImage.get(receiver);
                 if (theme) {
-                    return res.json({ status: true, theme });
+                    data.theme = theme;
                 } else {
                     setting.chat.theme.set(receiver, '0');
-                    return res.json({ status: true, theme: '0' });
+                    data.theme = '0';
                 }
+                if (backgroundImage) {
+                    data.backgroundImage = backgroundImage;
+                } else {
+                    data.backgroundImage = '';
+                }
+                return res.json({ status: true, setting: data });
             });
         });
     }
