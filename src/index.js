@@ -106,6 +106,11 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('change background private', { user: sender, backgroundImage: background });
     });
 
+    socket.on('revoke message', ({ to, from, sender, messageId }) => {
+        // console.log(data);
+        socket.to(to).to(from).emit('revoke message private', { sender, messageId });
+    });
+
     socket.on('disconnect', async () => {
         // console.log('Client disconnected:', socket.id);
         socket.broadcast.emit('user disconnected', socket.id);

@@ -180,9 +180,12 @@ class MessageController {
         Message.findOne({ _id: messageId }, function (err, message) {
             if (message) {
                 if (action == 'revoke' && type != 'revoked') {
-                    console.log('thu hoi tin nhan');
+                    // console.log('thu hoi tin nhan');
                     message.type = 'revoked';
                     message.text = 'Tin nhắn đã bị thu hồi';
+                    message.audio = undefined;
+                    message.video = undefined;
+                    message.file = undefined;
                     // message.save();
                     return res.json({ status: true, msg: 'thu hồi tin nhắn thành công' });
                 } else {
