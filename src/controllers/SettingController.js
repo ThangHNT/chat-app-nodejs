@@ -2,13 +2,20 @@ const Setting = require('../models/setting');
 const User = require('../models/user');
 
 class SettingController {
+    getGeneralSettings(req, res) {
+        const { userId } = req.query;
+        User.findOne({ _id: userId }, (err, user) => {
+            Setting.findOne({ _id: user.setting }, (err, setting) => {
+                res.json({ status: true, setting: setting.general });
+            });
+        });
+    }
+
     getTheme(req, res) {
         const { sender, receiver } = req.body;
         // console.log(req.body);
         User.findOne({ _id: sender }, (err, user) => {
             Setting.findOne({ _id: user.setting }, (err, setting) => {
-                // console.log(setting.chat.theme);
-                // return res.json({ status: true, setting: setting.chat });
                 let data = {};
                 const theme = setting.chat.theme.get(receiver);
                 const backgroundImage = setting.chat.backgroundImage.get(receiver);
@@ -92,6 +99,20 @@ class SettingController {
             .catch((err) => {
                 console.log('loi change them');
             });
+    }
+
+    changeGenaralSettings(req, res) {
+        // console.log(req.body);
+        const { userId, type, value } = req.body;
+        User.findOne({ _id: userId }, (err, user) => {
+            Setting.findOne({ _id: user.setting }, (err, setting) => {
+                if (type === 'dark mode') {
+                    setting.general.darkMode = value;
+                    setting.save();
+                    res.send('oke');
+                }
+            });
+        });
     }
 }
 

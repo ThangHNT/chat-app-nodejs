@@ -8,9 +8,9 @@ const Setting = new Schema({
     },
     general: {
         darkMode: { type: Boolean, default: false },
-        texttingSound: { type: Boolean, default: false },
-        sendMessageSound: { type: Boolean, default: false },
-        notificationSound: { type: Boolean, default: false },
+        texttingSound: { type: Boolean, default: true },
+        sendMessageSound: { type: Boolean, default: true },
+        notificationSound: { type: Boolean, default: true },
     },
 });
 

@@ -24,7 +24,7 @@ class UserController {
                     userCheck.setting = setting;
                     setting.save();
                     userCheck.save();
-                    user.setting = setting.general;
+                    // user.setting = setting.general;
                     return res.json({ status: true, user });
                 } else {
                     Setting.findOne({ _id: userCheck.setting }, (err, setting) => {
@@ -64,7 +64,7 @@ class UserController {
                 username: user.username,
                 _id: user._id,
                 avatar: user.avatar,
-                setting: setting.general,
+                // setting: setting.general,
             };
             return res.json({ status: true, newUser });
         } catch (e) {
