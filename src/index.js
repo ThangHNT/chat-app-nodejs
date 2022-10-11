@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('revoke message', ({ to, from, sender, messageId }) => {
-        // console.log(data);
+        // console.log(sender, messageId);
         socket.to(to).to(from).emit('revoke message private', { sender, messageId });
     });
 
