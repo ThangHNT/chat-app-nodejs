@@ -93,8 +93,8 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('user is unblocked', { sender, receiver });
     });
 
-    socket.on('remove reaction icon', ({ from, to, receiver, messageId }) => {
-        socket.to(to).to(from).emit('remove reaction icon private', { receiver, messageId });
+    socket.on('remove reaction icon', ({ from, to, receiver, sender, messageId }) => {
+        socket.to(to).to(from).emit('remove reaction icon private', { sender, receiver, messageId });
     });
 
     socket.on('change theme', ({ sender, theme, to, from }) => {

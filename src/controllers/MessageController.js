@@ -63,7 +63,6 @@ class MessageController {
 
     sendMessage(req, res, next) {
         const { sender, receiver, messages } = req.body;
-        // console.log(messages);
         messages.content.forEach((msg) => {
             const message = new Message();
             message.sender = sender;
@@ -89,9 +88,10 @@ class MessageController {
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
             }
-            message.save();
+            // message.save();
+            msg.id = String(message._id);
         });
-        res.json({ status: true, msg: 'thanh cong' });
+        res.json({ status: true, messages });
     }
 
     sendReactionIcon(req, res) {
