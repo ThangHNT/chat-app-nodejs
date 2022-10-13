@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require('../controllers/UserController.js');
 
 router.get('/', userController.home);
+router.post('/api/update/my-account', userController.updateAccount); // Cập nhật thông tin tài khoản
 router.get('/api/receiver/:id', userController.getReciever); // lấy thông tin ng định gửi tin nhắn
 router.post('/api/block-user', userController.blockUser); // chặn ng dùng
 router.post('/api/unblock-user', userController.unblockUser); // bỏ chặn ng dùng

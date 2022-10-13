@@ -198,6 +198,24 @@ class UserController {
             });
         });
     }
+
+    updateAccount(req, res) {
+        const { userId, username, oldpassword, newpassword, avatar } = req.body;
+        // console.log(req.body);
+        User.findOne({ _id: userId }, function (err, user) {
+            user.avatar = avatar ? avatar : user.avatar;
+            user.username = username ? username : user.username;
+            if (oldpassword && newpassword) {
+                if (user.password != oldpassword) {
+                    return res.json({ status: false, msg: 'Mật khẩu không đúng.' });
+                } else {
+                    user.password = newpassword;
+                }
+            }
+            // user.save();
+            return res.json({ status: true, msg: 'Đã cập nhật tài khoản.' });
+        });
+    }
 }
 
 module.exports = new UserController();
