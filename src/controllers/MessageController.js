@@ -189,7 +189,6 @@ class MessageController {
                     // message.save();
                     return res.json({ status: true, msg: 'thu hồi tin nhắn thành công' });
                 } else {
-                    // console.log('xoa tn');
                     if (message.userDeletedMessage.length == 0) {
                         message.userDeletedMessage.push(userId);
                         // message.save();

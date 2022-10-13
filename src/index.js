@@ -15,9 +15,9 @@ app.use(express.json({ limit: '100mb' }));
 async function connect() {
     try {
         await mongoose.connect('mongodb://localhost:27017/chat');
-        console.log('Connect successfully');
+        console.log('Connect database successfully');
     } catch (err) {
-        console.log('connect failed');
+        console.log('connect database failed');
     }
 }
 

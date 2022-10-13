@@ -8,30 +8,22 @@ class UserController {
 
     async login(req, res, next) {
         try {
-            const { username, password } = req.body;
+            const { account, password } = req.body;
 
-            const userCheck = await User.findOne({ username, password });
+            const userCheck = await User.findOne({ account, password });
             if (!userCheck) {
                 return res.json({ msg: 'Tài khoản hoặc mật khẩu không đúng.', status: false });
             } else {
                 const user = {
-                    username: userCheck.username,
+                    account: userCheck.account,
                     _id: userCheck._id,
                     avatar: userCheck.avatar,
+                    username: userCheck.username,
                 };
-                if (!userCheck.setting) {
-                    const setting = new Setting();
-                    userCheck.setting = setting;
-                    setting.save();
-                    userCheck.save();
-                    // user.setting = setting.general;
+                Setting.findOne({ _id: userCheck.setting }, (err, setting) => {
+                    user.setting = setting.general;
                     return res.json({ status: true, user });
-                } else {
-                    Setting.findOne({ _id: userCheck.setting }, (err, setting) => {
-                        user.setting = setting.general;
-                        return res.json({ status: true, user });
-                    });
-                }
+                });
             }
         } catch (err) {
             console.log('login that bai');
@@ -40,9 +32,9 @@ class UserController {
 
     async register(req, res, next) {
         try {
-            const { username, email, password } = req.body;
-            const usernameCheck = await User.findOne({ username });
-            if (usernameCheck) {
+            const { account, email, password } = req.body;
+            const accountCheck = await User.findOne({ account });
+            if (accountCheck) {
                 return res.json({ msg: 'Tên người dùng đã tồn tại', status: false });
             }
             const emailCheck = await User.findOne({ email });
@@ -50,10 +42,11 @@ class UserController {
                 return res.json({ msg: 'Email đã được đăng ký', status: false });
             }
             const user = new User({
-                username,
+                account,
                 password,
                 email,
                 avatar: 'https://png.pngtree.com/element_our/md/20180710/md_5b44128b4c192.jpg',
+                username: account,
             });
             delete user.password;
             const setting = new Setting();
@@ -61,8 +54,9 @@ class UserController {
             setting.save();
             user.save();
             const newUser = {
-                username: user.username,
                 _id: user._id,
+                account: user.account,
+                username: user.account,
                 avatar: user.avatar,
                 // setting: setting.general,
             };
@@ -156,7 +150,7 @@ class UserController {
                 });
                 if (!checkUserExist) {
                     user.blockList.push(receiver);
-                    user.save();
+                    // user.save();
                 }
                 res.json({ status: true });
             } else res.json({ status: false });
