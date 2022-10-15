@@ -100,7 +100,7 @@ class MessageController {
         Message.findOne({ _id: messageId }, function (err, message) {
             if (message) {
                 message.reactionIcon = reaction;
-                message.save();
+                // message.save();
                 return res.json({ status: true });
             } else {
                 res.json({ status: false });
@@ -114,7 +114,7 @@ class MessageController {
         Message.findOne({ _id: messageId }, function (err, message) {
             if (message) {
                 message.reactionIcon = '';
-                message.save();
+                // message.save();
                 return res.json({ status: true });
             } else {
                 res.json({ status: false });

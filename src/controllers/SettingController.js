@@ -4,6 +4,7 @@ const User = require('../models/user');
 class SettingController {
     getGeneralSettings(req, res) {
         const { userId } = req.query;
+        // console.log(userId);
         User.findOne({ _id: userId }, (err, user) => {
             Setting.findOne({ _id: user.setting }, (err, setting) => {
                 res.json({ status: true, setting: setting.general });
@@ -109,7 +110,14 @@ class SettingController {
                 if (type === 'dark mode') {
                     setting.general.darkMode = value;
                     setting.save();
-                    res.send('oke');
+                    res.json({ status: true });
+                } else if (type == 'sound') {
+                    const { notify, send, textting } = value;
+                    setting.general.texttingSound = textting;
+                    setting.general.sendMessageSound = send;
+                    setting.general.notificationSound = notify;
+                    setting.save();
+                    res.json({ status: true });
                 }
             });
         });

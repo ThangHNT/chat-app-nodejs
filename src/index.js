@@ -62,8 +62,6 @@ io.on('connection', (socket) => {
     // console.log(io.allSockets());
 
     socket.on('send message', ({ sender, receiver, to, from, content }) => {
-        // console.log('to', to);
-        // console.log('from', from);
         socket.to(to).to(from).emit('private message', {
             content,
             to,
