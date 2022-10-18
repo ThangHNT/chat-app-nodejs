@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Setting = require('../models/setting');
+const bcrypt = require('bcrypt');
 
 class UserController {
     home(req, res, next) {
@@ -9,18 +10,20 @@ class UserController {
     async login(req, res, next) {
         try {
             const { account, password } = req.body;
-
-            const userCheck = await User.findOne({ account, password });
-            if (!userCheck) {
+            const currentUser = await User.findOne({ account });
+            if (!currentUser) return res.json({ msg: 'Tài khoản hoặc mật khẩu không đúng.', status: false });
+            const hashPassword = await bcrypt.compare(password, currentUser.password);
+            // console.log(hashPassword);
+            if (!hashPassword) {
                 return res.json({ msg: 'Tài khoản hoặc mật khẩu không đúng.', status: false });
             } else {
                 const user = {
-                    account: userCheck.account,
-                    _id: userCheck._id,
-                    avatar: userCheck.avatar,
-                    username: userCheck.username,
+                    account: currentUser.account,
+                    _id: currentUser._id,
+                    avatar: currentUser.avatar,
+                    username: currentUser.username,
                 };
-                Setting.findOne({ _id: userCheck.setting }, (err, setting) => {
+                Setting.findOne({ _id: currentUser.setting }, (err, setting) => {
                     user.setting = setting.general;
                     return res.json({ status: true, user });
                 });
@@ -41,9 +44,10 @@ class UserController {
             if (emailCheck) {
                 return res.json({ msg: 'Email đã được đăng ký', status: false });
             }
+            const hashPassword = await bcrypt.hash(password, 10);
             const user = new User({
                 account,
-                password,
+                password: hashPassword,
                 email,
                 avatar: 'https://png.pngtree.com/element_our/md/20180710/md_5b44128b4c192.jpg',
                 username: account,
