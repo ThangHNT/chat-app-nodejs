@@ -5,9 +5,7 @@ const checkMessageDeleted = (arr, userId) => {
     const ans = [];
     arr.forEach((msg) => {
         if (msg.userDeletedMessage) {
-            const checkMsg = msg.userDeletedMessage.some((id) => {
-                return id != userId;
-            });
+            const checkMsg = msg.userDeletedMessage.has(userId);
             if (!checkMsg) ans.push(msg);
         }
     });
@@ -36,6 +34,7 @@ class MessageController {
                         return obj;
                     });
                     const arr2 = checkMessageDeleted(messages2, sender);
+                    // console.log(arr1, arr2);
                     const data2 = arr2.map((item) => {
                         const obj = {
                             id: item._id,
@@ -67,7 +66,6 @@ class MessageController {
             const message = new Message();
             message.sender = sender;
             message.receiver = receiver;
-            message.userDeletedMessage = [];
             const type = msg.type;
             if (msg.type === 'text') {
                 message.type = 'text';
@@ -88,7 +86,7 @@ class MessageController {
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
             }
-            message.save();
+            // message.save();
             msg.id = String(message._id);
         });
         res.json({ status: true, messages });
@@ -127,56 +125,29 @@ class MessageController {
         const { receiver, sender } = req.body;
         Message.find({ sender, receiver }, function (err, messages) {
             Message.find({ sender: receiver, receiver: sender }, function (err, messages2) {
-                if (messages.length > 0 || messages2.length > 0) {
-                    // console.log(checkMessageDeleted(messages));
-                    const arr = checkMessageDeleted(messages, sender);
-                    const arr2 = checkMessageDeleted(messages2, sender);
-                    let n = arr.length;
-                    let m = arr2.length;
-                    let a = arr[n - 1];
-                    let b = arr2[m - 1];
-                    if (arr.length > 0 && arr2.length > 0) {
-                        let msg = '';
-                        let time1 = a.createdAt.getTime();
-                        let time2 = b.createdAt.getTime();
-                        if (time1 > time2) {
-                            msg = { message: a, time: time1 };
-                        } else {
-                            msg = {
-                                message: b,
-                                time: time2,
-                            };
-                        }
-                        return res.json({ status: true, message: msg });
-                    } else if (arr.length > 0) {
-                        let time = a.createdAt.getTime();
-                        let msg = {
-                            message: a,
-                            time,
-                        };
-                        return res.json({ status: true, message: msg });
-                    } else if (arr2.length > 0) {
-                        let time = b.createdAt.getTime();
-                        let msg = {
-                            message: b,
-                            time,
-                        };
-                        return res.json({ status: true, message: msg });
-                    }
-                } else {
-                    return res.json({ status: false, msg: 'chua co tin nhan nao dc gui' });
+                const arr1 = checkMessageDeleted(messages, sender);
+                const arr2 = checkMessageDeleted(messages2, sender);
+                let a = arr1[arr1.length - 1];
+                let b = arr2[arr2.length - 1];
+                let message = undefined;
+                if (a && b) {
+                    if (a.createdAt.getTime() > b.createdAt.getTime()) {
+                        message = a;
+                    } else message = b;
+                } else if (a && !b) {
+                    message = a;
+                } else if (!a && b) {
+                    message = b;
                 }
+                return res.json({ status: true, message });
             });
         });
-    }
-
-    deleteAllMessages(req, res) {
-        return res.json({ status: true });
     }
 
     revokeMessage(req, res) {
         // console.log(req.body);
         const { messageId, action, userId, type } = req.body;
+        console.log(req.body);
         Message.findOne({ _id: messageId }, function (err, message) {
             if (message) {
                 if (action == 'revoke' && type != 'revoked') {
@@ -189,15 +160,23 @@ class MessageController {
                     // message.save();
                     return res.json({ status: true, msg: 'thu hồi tin nhắn thành công' });
                 } else {
-                    if (message.userDeletedMessage.length == 0) {
-                        message.userDeletedMessage.push(userId);
-                        // message.save();
-                    } else {
-                        // message.remove();
+                    if (!message.userDeletedMessage.has(userId)) {
+                        if (message.userDeletedMessage.size > 0) {
+                            // message.remove();
+                        } else {
+                            message.userDeletedMessage.set(userId);
+                            // message.save();
+                        }
                     }
                     return res.json({ status: true, msg: 'Xóa tin nhắn thành công' });
                 }
             }
+        });
+    }
+
+    deleteAllMessages(req, res) {
+        Message.deleteMany({}, (err, messages) => {
+            return res.send('xoa het tat ca tin nhan');
         });
     }
 
@@ -207,24 +186,22 @@ class MessageController {
             Message.find({ sender: receiver, receiver: sender }, (err, messages2) => {
                 // console.log(messages, messages2);
                 messages.forEach((msg) => {
-                    let checkUserIdExist = msg.userDeletedMessage.some((userId) => userId === sender);
-                    if (!checkUserIdExist) {
-                        if (msg.userDeletedMessage.length > 0) {
-                            msg.remove();
+                    if (!msg.userDeletedMessage.has(sender)) {
+                        if (msg.userDeletedMessage.has(receiver)) {
+                            // msg.remove();
                         } else {
-                            msg.userDeletedMessage.push(sender);
-                            msg.save();
+                            msg.userDeletedMessage.set(sender, true);
+                            // msg.save();
                         }
                     }
                 });
-                messages2.forEach((msg) => {
-                    let checkUserIdExist = msg.userDeletedMessage.some((userId) => userId === sender);
-                    if (!checkUserIdExist) {
-                        if (msg.userDeletedMessage.length > 0) {
-                            msg.remove();
+                messages2.forEach((msg2) => {
+                    if (!msg2.userDeletedMessage.has(sender)) {
+                        if (msg2.userDeletedMessage.has(receiver)) {
+                            // msg2.remove();
                         } else {
-                            msg.userDeletedMessage.push(sender);
-                            msg.save();
+                            msg2.userDeletedMessage.set(sender, true);
+                            // msg2.save();
                         }
                     }
                 });

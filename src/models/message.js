@@ -15,7 +15,7 @@ const Message = new Schema(
             size: { type: String },
         },
         reactionIcon: { type: String, default: '' },
-        userDeletedMessage: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        userDeletedMessage: { type: Map, default: new Map() },
     },
     {
         timestamps: true,
