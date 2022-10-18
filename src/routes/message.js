@@ -9,5 +9,6 @@ router.post('/api/send/message', messageController.sendMessage); // gửi tin nh
 router.post('/api/lastest-message', messageController.getLastestMessage); // lấy tin nhắn mới nhất đã gửi
 router.post('/api/get/messages', messageController.getMessages); // lấy tất cả tin nhắn đã gửi
 router.post('/api/revoke-message', messageController.revokeMessage); // gỡ bỏ tin nhắn
+router.post('/api/delete/chat', messageController.deleteChat); // xóa bỏ đoạn chat
 
 module.exports = router;

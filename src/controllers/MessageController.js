@@ -88,7 +88,7 @@ class MessageController {
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
             }
-            // message.save();
+            message.save();
             msg.id = String(message._id);
         });
         res.json({ status: true, messages });
@@ -198,6 +198,38 @@ class MessageController {
                     return res.json({ status: true, msg: 'Xóa tin nhắn thành công' });
                 }
             }
+        });
+    }
+
+    deleteChat(req, res) {
+        const { sender, receiver } = req.body;
+        Message.find({ sender, receiver }, (err, messages) => {
+            Message.find({ sender: receiver, receiver: sender }, (err, messages2) => {
+                // console.log(messages, messages2);
+                messages.forEach((msg) => {
+                    let checkUserIdExist = msg.userDeletedMessage.some((userId) => userId === sender);
+                    if (!checkUserIdExist) {
+                        if (msg.userDeletedMessage.length > 0) {
+                            msg.remove();
+                        } else {
+                            msg.userDeletedMessage.push(sender);
+                            msg.save();
+                        }
+                    }
+                });
+                messages2.forEach((msg) => {
+                    let checkUserIdExist = msg.userDeletedMessage.some((userId) => userId === sender);
+                    if (!checkUserIdExist) {
+                        if (msg.userDeletedMessage.length > 0) {
+                            msg.remove();
+                        } else {
+                            msg.userDeletedMessage.push(sender);
+                            msg.save();
+                        }
+                    }
+                });
+                return res.json({ status: true, msg: 'xoa doan chat thanh cong' });
+            });
         });
     }
 }
