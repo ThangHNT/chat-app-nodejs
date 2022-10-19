@@ -12,7 +12,7 @@ class UserController {
         try {
             const { account, password } = req.body;
             const currentUser = await User.findOne({ account });
-            if (!currentUser) return res.json({ msg: 'Tài khoản hoặc mật khẩu không đúng.', status: false });
+            if (!currentUser) return res.json({ msg: 'Tài khoản này chưa được đăng ký.', status: false });
             const hashPassword = await bcrypt.compare(password, currentUser.password);
             // console.log(hashPassword);
             if (!hashPassword) {
@@ -63,7 +63,6 @@ class UserController {
                 account: user.account,
                 username: user.account,
                 avatar: user.avatar,
-                // setting: setting.general,
             };
             return res.json({ status: true, newUser });
         } catch (e) {
@@ -223,6 +222,18 @@ class UserController {
     }
 
     checkAdmin(req, res) {
+        const { userId } = req.body;
+        // console.log(userId);
+        User.findOne({ _id: userId }, (err, user) => {
+            if (user.admin) {
+                return res.json({ status: true, admin: true });
+            } else {
+                return res.json({ status: true, admin: false });
+            }
+        });
+    }
+
+    adminDeletePermission(req, res) {
         const { type } = req.body;
         // console.log(type);
         if (type == 'delete-all-message') {

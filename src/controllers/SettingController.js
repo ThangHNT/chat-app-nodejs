@@ -4,11 +4,15 @@ const User = require('../models/user');
 class SettingController {
     getGeneralSettings(req, res) {
         const { userId } = req.query;
-        // console.log(userId);
         User.findOne({ _id: userId }, (err, user) => {
-            Setting.findOne({ _id: user.setting }, (err, setting) => {
-                res.json({ status: true, setting: setting.general });
-            });
+            // console.log(user);
+            if (user.setting) {
+                Setting.findOne({ _id: user.setting }, (err, setting) => {
+                    res.json({ status: true, setting: setting.general });
+                });
+            } else {
+                return res.json({ status: false });
+            }
         });
     }
 
