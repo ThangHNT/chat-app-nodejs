@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Setting = require('../models/setting');
+const Message = require('../models/message');
 const bcrypt = require('bcrypt');
 
 class UserController {
@@ -219,6 +220,21 @@ class UserController {
             // user.save();
             return res.json({ status: true, msg: 'Đã cập nhật tài khoản.' });
         });
+    }
+
+    checkAdmin(req, res) {
+        const { type } = req.body;
+        // console.log(type);
+        if (type == 'delete-all-message') {
+            Message.deleteMany({}, (err, messages) => {});
+            return res.json({ status: true, msg: 'xoa tat ca tin nhan thanh cong' });
+        } else if (type == 'delete-all-user') {
+            User.deleteMany({}, (err, users) => {});
+            return res.json({ status: true, msg: 'xoa tat ca user thanh cong' });
+        } else if (type == 'delete-all-setting') {
+            Setting.deleteMany({}, (err, setting) => {});
+            return res.json({ status: true, msg: 'xoa tat ca setting thanh cong' });
+        }
     }
 }
 

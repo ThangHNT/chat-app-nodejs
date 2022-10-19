@@ -9,6 +9,7 @@ const User = new Schema({
     avatar: { type: String },
     blockList: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     setting: { type: Schema.Types.ObjectId, ref: 'Setting' },
+    admin: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('User', User);

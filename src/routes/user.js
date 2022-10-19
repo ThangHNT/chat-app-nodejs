@@ -11,6 +11,7 @@ router.post('/api/check-block-status', userController.checkBlockStatus); // ki�
 router.get('/api/search', userController.searchUser); // tìm kiếm ng dùng trong hệ thống
 router.post('/api/message-item', userController.messageItem); // lấy thông tin ng dùng và hiển thị bên sidebar
 router.post('/register', userController.register); // đk tk mới
+router.post('/api/check-admin', userController.checkAdmin); // kiểm tra tài khoản xem có phải admin ko
 router.post('/login', userController.login);
 
 module.exports = router;
