@@ -78,7 +78,9 @@ class MessageController {
                 type == 'video' ||
                 type == 'audio' ||
                 type == 'doc-file' ||
-                type == 'pdf-file'
+                type == 'pdf-file' ||
+                type == 'excel-file' ||
+                type == 'powerpoint-file'
             ) {
                 // console.log(msg.file);
                 message.type = type;
@@ -112,7 +114,7 @@ class MessageController {
         Message.findOne({ _id: messageId }, function (err, message) {
             if (message) {
                 message.reactionIcon = '';
-                // message.save();
+                message.save();
                 return res.json({ status: true });
             } else {
                 res.json({ status: false });
@@ -146,8 +148,8 @@ class MessageController {
 
     revokeMessage(req, res) {
         // console.log(req.body);
-        const { messageId, action, userId, type } = req.body;
-        console.log(req.body);
+        const { messageId, action, senderId, type } = req.body;
+        // console.log(req.body);
         Message.findOne({ _id: messageId }, function (err, message) {
             if (message) {
                 if (action == 'revoke' && type != 'revoked') {
@@ -157,15 +159,15 @@ class MessageController {
                     message.audio = undefined;
                     message.video = undefined;
                     message.file = undefined;
-                    // message.save();
+                    message.save();
                     return res.json({ status: true, msg: 'thu hồi tin nhắn thành công' });
                 } else {
-                    if (!message.userDeletedMessage.has(userId)) {
+                    if (!message.userDeletedMessage.has(senderId)) {
                         if (message.userDeletedMessage.size > 0) {
-                            // message.remove();
+                            message.remove();
                         } else {
-                            message.userDeletedMessage.set(userId);
-                            // message.save();
+                            message.userDeletedMessage.set(senderId, true);
+                            message.save();
                         }
                     }
                     return res.json({ status: true, msg: 'Xóa tin nhắn thành công' });
@@ -188,20 +190,20 @@ class MessageController {
                 messages.forEach((msg) => {
                     if (!msg.userDeletedMessage.has(sender)) {
                         if (msg.userDeletedMessage.has(receiver)) {
-                            // msg.remove();
+                            msg.remove();
                         } else {
                             msg.userDeletedMessage.set(sender, true);
-                            // msg.save();
+                            msg.save();
                         }
                     }
                 });
                 messages2.forEach((msg2) => {
                     if (!msg2.userDeletedMessage.has(sender)) {
                         if (msg2.userDeletedMessage.has(receiver)) {
-                            // msg2.remove();
+                            msg2.remove();
                         } else {
                             msg2.userDeletedMessage.set(sender, true);
-                            // msg2.save();
+                            msg2.save();
                         }
                     }
                 });

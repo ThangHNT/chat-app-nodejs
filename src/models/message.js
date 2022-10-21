@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const mongoose_delete = require('mongoose-delete');
+// const mongoose_delete = require('mongoose-delete');
 const Schema = mongoose.Schema;
 
 const Message = new Schema(
@@ -23,6 +23,6 @@ const Message = new Schema(
 );
 
 // plugin soft delete
-Message.plugin(mongoose_delete);
+// Message.plugin(mongoose_delete);
 
 module.exports = mongoose.model('Message', Message);

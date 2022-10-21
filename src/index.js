@@ -109,6 +109,15 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('revoke message private', { sender, messageId });
     });
 
+    socket.on('callUser', ({ sender, signal, to, from }) => {
+        // console.log(sender);
+        socket.to(to).to(from).emit('callUser', { sender, signal });
+    });
+
+    socket.on('answerCall', (data) => {
+        socket.broadcast.emit('callAccepted', data);
+    });
+
     socket.on('disconnect', async () => {
         // console.log('Client disconnected:', socket.id);
         socket.broadcast.emit('user disconnected', socket.id);
