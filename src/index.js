@@ -114,8 +114,8 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('callUser', { sender, signal });
     });
 
-    socket.on('answerCall', (data) => {
-        socket.broadcast.emit('callAccepted', data);
+    socket.on('answerCall', ({ to, from, sender, signal }) => {
+        socket.to(to).to(from).emit('callAccepted', signal);
     });
 
     socket.on('disconnect', async () => {
