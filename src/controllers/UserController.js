@@ -233,6 +233,16 @@ class UserController {
         });
     }
 
+    async checkAccount(req, res) {
+        const { userId } = req.body;
+        const user = await User.findOne({ _id: userId });
+        if (user) {
+            return res.json({ exist: true });
+        } else {
+            return res.json({ exist: false });
+        }
+    }
+
     adminDeletePermission(req, res) {
         const { type } = req.body;
         // console.log(type);

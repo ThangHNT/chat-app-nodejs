@@ -13,6 +13,7 @@ router.post('/api/message-item', userController.messageItem); // lấy thông ti
 router.post('/register', userController.register); // đk tk mới
 router.post('/api/check-admin', userController.checkAdmin); // kiểm tra tài khoản xem có phải admin ko
 router.post('/api/delete/force', userController.adminDeletePermission); // admin xóa bỏ tất cả tn or user or setting
+router.post('/api/check-account', userController.checkAccount); // kiểm tra xem account còn trong db ko
 
 router.post('/login', userController.login);
 
