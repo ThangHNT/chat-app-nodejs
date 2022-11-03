@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-// const mongoose_delete = require('mongoose-delete');
+const mongoose = require('../utiles/mongoAtlat');
+
+// const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const Message = new Schema(
