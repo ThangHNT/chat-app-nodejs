@@ -46,13 +46,33 @@ io.use((socket, next) => {
     next();
 });
 
+var usersInCall = [];
+
+const handleCheckUserInCall = (userId) => {
+    return usersInCall.some((user) => {
+        return userId === user;
+    });
+};
+
+const handleAddUserInCall = (userId) => {
+    let checkExistUser = usersInCall.some((user) => {
+        return userId == user;
+    });
+    if (!checkExistUser) usersInCall.push(userId);
+};
+
+const handleRemoveUserInCall = (userId) => {
+    usersInCall = usersInCall.filter((item) => {
+        return item !== userId;
+    });
+};
+
 io.on('connection', (socket) => {
     const users = [];
     for (let [id, socket] of io.of('/').sockets) {
         users.push({ socketId: id, userId: socket.userId });
     }
     socket.emit('users', users);
-    // console.log(users);
 
     socket.broadcast.emit('user just connected', {
         socketId: socket.id,
@@ -109,17 +129,27 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('revoke message private', { sender, messageId });
     });
 
-    socket.on('callUser', ({ sender, signal, to, from }) => {
-        // console.log(sender);
-        socket.to(to).to(from).emit('callUser', { sender, signal });
+    socket.on('callUser', ({ sender, receiver, signal, to, from }) => {
+        console.log(from, to);
+        if (handleCheckUserInCall(receiver) == false) {
+            handleAddUserInCall(sender);
+            socket.to(to).to(from).emit('callUser', { sender, signal });
+        } else {
+            socket.emit('user busy', { value: true });
+        }
     });
 
-    socket.on('answerCall', ({ to, from, signal }) => {
+    socket.on('answerCall', ({ to, from, signal, sender }) => {
+        handleAddUserInCall(sender);
         socket.to(to).to(from).emit('callAccepted', signal);
     });
 
-    socket.on('end call', ({ to, from, sender, msg }) => {
-        socket.to(to).to(from).emit('end call', { sender, msg });
+    socket.on('end call', ({ to, from, sender, receiver, msg }) => {
+        if (handleCheckUserInCall(receiver) && handleCheckUserInCall(sender)) {
+            handleRemoveUserInCall(sender);
+            handleRemoveUserInCall(receiver);
+            socket.to(to).to(from).emit('end call', { sender, msg });
+        }
     });
 
     socket.on('change media', ({ sender, kind, status, to, from }) => {
@@ -128,6 +158,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', async () => {
         // console.log('Client disconnected:', socket.id);
+        handleRemoveUserInCall(socket.id);
         socket.broadcast.emit('user disconnected', socket.id);
     });
 });
