@@ -130,7 +130,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('callUser', ({ sender, receiver, signal, to, from }) => {
-        console.log(from, to);
         if (handleCheckUserInCall(receiver) == false) {
             handleAddUserInCall(sender);
             socket.to(to).to(from).emit('callUser', { sender, signal });

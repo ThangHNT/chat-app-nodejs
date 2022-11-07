@@ -2,6 +2,7 @@ const User = require('../models/user');
 const Setting = require('../models/setting');
 const Message = require('../models/message');
 const bcrypt = require('bcrypt');
+const { createJWT, verifyToken } = require('../middleware/JWT');
 
 class UserController {
     home(req, res, next) {
@@ -14,7 +15,6 @@ class UserController {
             const currentUser = await User.findOne({ account });
             if (!currentUser) return res.json({ msg: 'Tài khoản này chưa được đăng ký.', status: false });
             const hashPassword = await bcrypt.compare(password, currentUser.password);
-            // console.log(hashPassword);
             if (!hashPassword) {
                 return res.json({ msg: 'Tài khoản hoặc mật khẩu không đúng.', status: false });
             } else {
@@ -26,6 +26,8 @@ class UserController {
                 };
                 Setting.findOne({ _id: currentUser.setting }, (err, setting) => {
                     user.setting = setting.general;
+                    let token = createJWT({ userId: user._id, admin: user.admin });
+                    user.token = token;
                     return res.json({ status: true, user });
                 });
             }
@@ -63,6 +65,7 @@ class UserController {
                 account: user.account,
                 username: user.account,
                 avatar: user.avatar,
+                token: createJWT({ userId: user._id, admin: user.admin }),
             };
             return res.json({ status: true, newUser });
         } catch (e) {
@@ -223,7 +226,6 @@ class UserController {
 
     checkAdmin(req, res) {
         const { userId } = req.body;
-        // console.log(userId);
         User.findOne({ _id: userId }, (err, user) => {
             if (user.admin) {
                 return res.json({ status: true, admin: true });
@@ -234,7 +236,11 @@ class UserController {
     }
 
     async checkAccount(req, res) {
-        const { userId } = req.body;
+        const { userId, token } = req.body;
+        let checkUser = verifyToken(token);
+        if (checkUser == null) {
+            return res.json({ exist: false });
+        }
         const user = await User.findOne({ _id: userId });
         if (user) {
             return res.json({ exist: true });
