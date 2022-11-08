@@ -28,7 +28,7 @@ class MessageController {
                             img: item.img,
                             file: item.file,
                             sender: item.sender,
-                            time: item.createdAt.getTime(),
+                            time: item.time,
                             reactionIcon: item.reactionIcon,
                         };
                         return obj;
@@ -43,7 +43,7 @@ class MessageController {
                             img: item.img,
                             file: item.file,
                             sender: item.sender,
-                            time: item.createdAt.getTime(),
+                            time: item.time,
                             reactionIcon: item.reactionIcon,
                         };
                         return obj;
@@ -62,10 +62,12 @@ class MessageController {
 
     sendMessage(req, res, next) {
         const { sender, receiver, messages } = req.body;
+        // console.log(messages);
         messages.content.forEach((msg) => {
             const message = new Message();
             message.sender = sender;
             message.receiver = receiver;
+            message.time = msg.time;
             const type = msg.type;
             if (msg.type === 'text') {
                 message.type = 'text';
@@ -82,22 +84,21 @@ class MessageController {
                 type == 'excel-file' ||
                 type == 'powerpoint-file'
             ) {
-                // console.log(msg.file);
                 message.type = type;
                 message.file.content = msg.file.content;
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
             }
-            // message.save();
+            message.save();
             msg.id = String(message._id);
         });
         res.json({ status: true, messages });
     }
 
     sendReactionIcon(req, res) {
-        const { messageId, reaction } = req.body;
+        const { time, reaction } = req.body;
         // console.log(req.body);
-        Message.findOne({ _id: messageId }, function (err, message) {
+        Message.findOne({ time: time }, function (err, message) {
             if (message) {
                 message.reactionIcon = reaction;
                 // message.save();
@@ -109,12 +110,12 @@ class MessageController {
     }
 
     removeReactionIcon(req, res) {
-        const { messageId } = req.body;
+        const { time } = req.body;
         // console.log(req.body);
-        Message.findOne({ _id: messageId }, function (err, message) {
+        Message.findOne({ time: time }, function (err, message) {
             if (message) {
                 message.reactionIcon = '';
-                message.save();
+                // message.save();
                 return res.json({ status: true });
             } else {
                 res.json({ status: false });
@@ -133,7 +134,7 @@ class MessageController {
                 let b = arr2[arr2.length - 1];
                 let message = undefined;
                 if (a && b) {
-                    if (a.createdAt.getTime() > b.createdAt.getTime()) {
+                    if (a.time > b.time) {
                         message = a;
                     } else message = b;
                 } else if (a && !b) {
@@ -147,10 +148,8 @@ class MessageController {
     }
 
     revokeMessage(req, res) {
-        // console.log(req.body);
-        const { messageId, action, senderId, type } = req.body;
-        // console.log(req.body);
-        Message.findOne({ _id: messageId }, function (err, message) {
+        const { sendat, action, senderId, type } = req.body;
+        Message.findOne({ time: sendat }, function (err, message) {
             if (message) {
                 if (action == 'revoke' && type != 'revoked') {
                     // console.log('thu hoi tin nhan');
@@ -159,26 +158,20 @@ class MessageController {
                     message.audio = undefined;
                     message.video = undefined;
                     message.file = undefined;
-                    message.save();
+                    // message.save();
                     return res.json({ status: true, msg: 'thu hồi tin nhắn thành công' });
                 } else {
                     if (!message.userDeletedMessage.has(senderId)) {
                         if (message.userDeletedMessage.size > 0) {
-                            message.remove();
+                            // message.remove();
                         } else {
                             message.userDeletedMessage.set(senderId, true);
-                            message.save();
+                            // message.save();
                         }
                     }
                     return res.json({ status: true, msg: 'Xóa tin nhắn thành công' });
                 }
             }
-        });
-    }
-
-    deleteAllMessages(req, res) {
-        Message.deleteMany({}, (err, messages) => {
-            return res.send('xoa het tat ca tin nhan');
         });
     }
 

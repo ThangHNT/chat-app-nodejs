@@ -16,6 +16,7 @@ const Message = new Schema(
         },
         reactionIcon: { type: String, default: '' },
         userDeletedMessage: { type: Map, default: new Map() },
+        time: { type: String, default: new Date() },
     },
     {
         timestamps: true,

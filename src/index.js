@@ -91,10 +91,10 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('send reaction icon', ({ sender, receiver, to, from, icon, messageId }) => {
-        // console.log(messageId);
+    socket.on('send reaction icon', ({ sender, receiver, to, from, icon, time }) => {
+        // console.log(time);
         socket.to(to).to(from).emit('private reaction message', {
-            messageId,
+            time,
             icon,
             sender,
             receiver,
@@ -111,8 +111,8 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('user is unblocked', { sender, receiver });
     });
 
-    socket.on('remove reaction icon', ({ from, to, receiver, sender, messageId }) => {
-        socket.to(to).to(from).emit('remove reaction icon private', { sender, receiver, messageId });
+    socket.on('remove reaction icon', ({ from, to, receiver, sender, time }) => {
+        socket.to(to).to(from).emit('remove reaction icon private', { sender, receiver, time });
     });
 
     socket.on('change theme', ({ sender, theme, to, from }) => {
@@ -124,9 +124,9 @@ io.on('connection', (socket) => {
         socket.to(to).to(from).emit('change background private', { user: sender, backgroundImage: background });
     });
 
-    socket.on('revoke message', ({ to, from, sender, messageId }) => {
-        // console.log(sender, messageId);
-        socket.to(to).to(from).emit('revoke message private', { sender, messageId });
+    socket.on('revoke message', ({ to, from, sender, time }) => {
+        // console.log(sender, time);
+        socket.to(to).to(from).emit('revoke message private', { sender, time });
     });
 
     socket.on('callUser', ({ sender, receiver, signal, to, from }) => {
