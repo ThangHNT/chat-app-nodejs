@@ -6,7 +6,7 @@ class SettingController {
         const { userId } = req.query;
         User.findOne({ _id: userId }, (err, user) => {
             // console.log(user);
-            if (user.setting) {
+            if (user) {
                 Setting.findOne({ _id: user.setting }, (err, setting) => {
                     res.json({ status: true, setting: setting.general });
                 });

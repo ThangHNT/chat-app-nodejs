@@ -26,8 +26,8 @@ class UserController {
                 };
                 Setting.findOne({ _id: currentUser.setting }, (err, setting) => {
                     user.setting = setting.general;
-                    let token = createJWT({ userId: user._id, admin: user.admin });
-                    user.token = token;
+                    // let token = createJWT({ userId: user._id, admin: user.admin });
+                    // user.token = token;
                     return res.json({ status: true, user });
                 });
             }
@@ -65,7 +65,7 @@ class UserController {
                 account: user.account,
                 username: user.account,
                 avatar: user.avatar,
-                token: createJWT({ userId: user._id, admin: user.admin }),
+                // token: createJWT({ userId: user._id, admin: user.admin }),
             };
             return res.json({ status: true, newUser });
         } catch (e) {
@@ -219,7 +219,7 @@ class UserController {
                     user.password = newpassword;
                 }
             }
-            // user.save();
+            user.save();
             return res.json({ status: true, msg: 'Đã cập nhật tài khoản.' });
         });
     }
@@ -236,11 +236,7 @@ class UserController {
     }
 
     async checkAccount(req, res) {
-        const { userId, token } = req.body;
-        let checkUser = verifyToken(token);
-        if (checkUser == null) {
-            return res.json({ exist: false });
-        }
+        const { userId } = req.body;
         const user = await User.findOne({ _id: userId });
         if (user) {
             return res.json({ exist: true });
