@@ -89,7 +89,7 @@ class MessageController {
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
             }
-            message.save();
+            // message.save();
             msg.id = String(message._id);
         });
         res.json({ status: true, messages });
