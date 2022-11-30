@@ -89,7 +89,7 @@ class MessageController {
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
             }
-            message.save();
+            // message.save();
             msg.id = String(message._id);
         });
         res.json({ status: true, messages });
@@ -101,7 +101,7 @@ class MessageController {
         Message.findOne({ time: time }, function (err, message) {
             if (message) {
                 message.reactionIcon = reaction;
-                // message.save();
+                message.save();
                 return res.json({ status: true });
             } else {
                 res.json({ status: false });
@@ -115,7 +115,7 @@ class MessageController {
         Message.findOne({ time: time }, function (err, message) {
             if (message) {
                 message.reactionIcon = '';
-                // message.save();
+                message.save();
                 return res.json({ status: true });
             } else {
                 res.json({ status: false });
@@ -148,8 +148,8 @@ class MessageController {
     }
 
     revokeMessage(req, res) {
-        const { sendat, action, senderId, type } = req.body;
-        Message.findOne({ time: sendat }, function (err, message) {
+        const { time, action, senderId, type } = req.body;
+        Message.findOne({ time: time }, function (err, message) {
             if (message) {
                 if (action == 'revoke' && type != 'revoked') {
                     // console.log('thu hoi tin nhan');
@@ -158,15 +158,15 @@ class MessageController {
                     message.audio = undefined;
                     message.video = undefined;
                     message.file = undefined;
-                    // message.save();
+                    message.save();
                     return res.json({ status: true, msg: 'thu hồi tin nhắn thành công' });
                 } else {
                     if (!message.userDeletedMessage.has(senderId)) {
                         if (message.userDeletedMessage.size > 0) {
-                            // message.remove();
+                            message.remove();
                         } else {
                             message.userDeletedMessage.set(senderId, true);
-                            // message.save();
+                            message.save();
                         }
                     }
                     return res.json({ status: true, msg: 'Xóa tin nhắn thành công' });
