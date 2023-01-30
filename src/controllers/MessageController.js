@@ -1,5 +1,6 @@
 const Message = require('../models/message');
 const User = require('../models/user');
+const FriendList = require('../models/friendlist');
 
 const checkMessageDeleted = (arr, userId) => {
     const ans = [];
@@ -60,9 +61,30 @@ class MessageController {
         });
     }
 
-    sendMessage(req, res, next) {
+    async sendMessage(req, res, next) {
         const { sender, receiver, messages } = req.body;
-        // console.log(messages);
+        let friendList = await FriendList.find();
+        // console.log(friendList);
+        if (friendList[0]) {
+            let list = friendList[0].friend.get(receiver);
+            let newArr = [];
+            newArr.push({ id: sender });
+            list.forEach((item) => {
+                if (item.id != sender) {
+                    newArr.push(item);
+                }
+            });
+            friendList[0].friend.set(receiver, newArr);
+            friendList[0].save();
+        } else {
+            friendList = new FriendList();
+            friendList.friend.set(receiver, [
+                {
+                    id: sender,
+                },
+            ]);
+            friendList.save();
+        }
         messages.content.forEach((msg) => {
             const message = new Message();
             message.sender = sender;

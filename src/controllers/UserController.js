@@ -3,6 +3,7 @@ const Setting = require('../models/setting');
 const Message = require('../models/message');
 const bcrypt = require('bcrypt');
 const { createJWT, verifyToken } = require('../middleware/JWT');
+const FriendList = require('../models/friendlist');
 
 class UserController {
     home(req, res, next) {
@@ -24,6 +25,7 @@ class UserController {
                     avatar: currentUser.avatar,
                     username: currentUser.username,
                 };
+                console.log(user);
                 Setting.findOne({ _id: currentUser.setting }, (err, setting) => {
                     user.setting = setting.general;
                     // let token = createJWT({ userId: user._id, admin: user.admin });
@@ -73,29 +75,57 @@ class UserController {
         }
     }
 
-    messageItem(req, res, next) {
-        const sender = req.body.sender;
-        User.find({}, function (err, users) {
-            if (users) {
-                let arr = [];
-                users.forEach((user) => {
-                    if (user._id != sender) {
-                        arr.push(user);
-                    }
-                });
-                const userList = arr.map((user) => {
-                    return {
-                        id: user._id,
-                        username: user.username,
-                        avatar: user.avatar,
-                    };
-                });
-                return res.json({ status: true, userList });
-            } else {
-                console.log('loi lay ds user');
-                res.json({ status: false, msg: 'loi lay ds user' });
-            }
-        });
+    async messageItem(req, res, next) {
+        const { sender } = req.body;
+        let friendList = await FriendList.find();
+        if (friendList[0] && friendList[0].friend.get(sender)) {
+            let list = friendList[0].friend.get(sender);
+            let arr = list.map(async (item) => {
+                let user = await User.findOne({ _id: item.id });
+                return {
+                    id: user._id,
+                    username: user.username,
+                    avatar: user.avatar,
+                };
+            });
+            let ans = Promise.all(arr);
+            ans.then((data) => {
+                return res.json({ status: true, userList: data });
+            });
+        } else {
+            const users = await User.find();
+            const userList = users.map((user) => {
+                return {
+                    id: user._id,
+                    username: user.username,
+                    avatar: user.avatar,
+                };
+            });
+            return res.json({ status: true, userList });
+        }
+        // return res.json({ status: false, msg: 'loi lay ds user' });
+
+        // User.find({}, function (err, users) {
+        //     if (users) {
+        //         let arr = [];
+        //         users.forEach((user) => {
+        //             if (user._id != sender) {
+        //                 arr.push(user);
+        //             }
+        //         });
+        //         const userList = arr.map((user) => {
+        //             return {
+        //                 id: user._id,
+        //                 username: user.username,
+        //                 avatar: user.avatar,
+        //             };
+        //         });
+        //         return res.json({ status: true, userList });
+        //     } else {
+        //         console.log('loi lay ds user');
+        //         res.json({ status: false, msg: 'loi lay ds user' });
+        //     }
+        // });
     }
 
     getReciever(req, res, next) {
