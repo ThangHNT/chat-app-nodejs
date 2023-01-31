@@ -25,7 +25,6 @@ class UserController {
                     avatar: currentUser.avatar,
                     username: currentUser.username,
                 };
-                console.log(user);
                 Setting.findOne({ _id: currentUser.setting }, (err, setting) => {
                     user.setting = setting.general;
                     // let token = createJWT({ userId: user._id, admin: user.admin });
@@ -94,7 +93,13 @@ class UserController {
             });
         } else {
             const users = await User.find();
-            const userList = users.map((user) => {
+            let arr = [];
+            users.forEach((user) => {
+                if (user._id != sender) {
+                    arr.push(user);
+                }
+            });
+            const userList = arr.map((user) => {
                 return {
                     id: user._id,
                     username: user.username,
@@ -126,6 +131,13 @@ class UserController {
         //         res.json({ status: false, msg: 'loi lay ds user' });
         //     }
         // });
+    }
+
+    async getAMessageItem(req, res) {
+        const userId = req.query.id;
+        const user = await User.findOne({ _id: userId });
+        if (!user) return res.json({ status: false, user: null });
+        return res.json({ status: true, user: { username: user.username, avatar: user.avatar, id: userId } });
     }
 
     getReciever(req, res, next) {

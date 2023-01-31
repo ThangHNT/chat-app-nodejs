@@ -66,16 +66,26 @@ class MessageController {
         let friendList = await FriendList.find();
         // console.log(friendList);
         if (friendList[0]) {
-            let list = friendList[0].friend.get(receiver);
-            let newArr = [];
-            newArr.push({ id: sender });
-            list.forEach((item) => {
+            let list1 = friendList[0].friend.get(receiver) ?? [];
+            let list2 = friendList[0].friend.get(sender) ?? [];
+            let arr1 = [];
+            arr1.push({ id: sender });
+            list1.forEach((item) => {
                 if (item.id != sender) {
-                    newArr.push(item);
+                    arr1.push(item);
                 }
             });
-            friendList[0].friend.set(receiver, newArr);
-            friendList[0].save();
+            friendList[0].friend.set(receiver, arr1);
+
+            let arr2 = [];
+            arr2.push({ id: sender });
+            list2.forEach((item) => {
+                if (item.id != receiver) {
+                    arr2.push(item);
+                }
+            });
+            friendList[0].friend.set(sender, arr2);
+            // friendList[0].save();
         } else {
             friendList = new FriendList();
             friendList.friend.set(receiver, [
@@ -83,7 +93,12 @@ class MessageController {
                     id: sender,
                 },
             ]);
-            friendList.save();
+            friendList.friend.set(sender, [
+                {
+                    id: receiver,
+                },
+            ]);
+            // friendList.save();
         }
         messages.content.forEach((msg) => {
             const message = new Message();
