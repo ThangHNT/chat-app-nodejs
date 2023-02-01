@@ -78,14 +78,14 @@ class MessageController {
             friendList[0].friend.set(receiver, arr1);
 
             let arr2 = [];
-            arr2.push({ id: sender });
+            arr2.push({ id: receiver });
             list2.forEach((item) => {
                 if (item.id != receiver) {
                     arr2.push(item);
                 }
             });
             friendList[0].friend.set(sender, arr2);
-            // friendList[0].save();
+            friendList[0].save();
         } else {
             friendList = new FriendList();
             friendList.friend.set(receiver, [
@@ -98,7 +98,7 @@ class MessageController {
                     id: receiver,
                 },
             ]);
-            // friendList.save();
+            friendList.save();
         }
         messages.content.forEach((msg) => {
             const message = new Message();
@@ -126,7 +126,7 @@ class MessageController {
                 message.file.filename = msg.file.filename;
                 message.file.size = msg.file.size;
             }
-            // message.save();
+            message.save();
             msg.id = String(message._id);
         });
         res.json({ status: true, messages });

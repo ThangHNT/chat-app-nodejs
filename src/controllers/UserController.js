@@ -74,7 +74,7 @@ class UserController {
         }
     }
 
-    async messageItem(req, res, next) {
+    async messageItem(req, res) {
         const { sender } = req.body;
         let friendList = await FriendList.find();
         if (friendList[0] && friendList[0].friend.get(sender)) {
